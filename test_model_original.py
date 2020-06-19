@@ -4,7 +4,6 @@ from scipy import misc
 import numpy as np
 import sys
 import os
-import time
 
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -31,11 +30,10 @@ def test_model():
 
     # Creating dataset loaders
 
-    ## visual_dataset = LoadVisualData(dataset_dir, 10, dslr_scale, level, full_resolution=True)
-    visual_dataset = LoadVisualData(dataset_dir, 168, dslr_scale, level, full_resolution=True)
+    visual_dataset = LoadVisualData(dataset_dir, 10, dslr_scale, level, full_resolution=True)
     visual_loader = DataLoader(dataset=visual_dataset, batch_size=1, shuffle=False, num_workers=0,
                                pin_memory=True, drop_last=False)
-
+    #print (visual_loader)
     # Creating and loading pre-trained PyNET model
 
     model = PyNET(level=level, instance_norm=True, instance_norm_level_1=True).to(device)
@@ -53,7 +51,7 @@ def test_model():
     model.eval()
 
     # Processing full-resolution RAW images
-    start = time.time()
+
     with torch.no_grad():
 
         visual_iter = iter(visual_loader)
@@ -77,13 +75,11 @@ def test_model():
             # Save the results as .png images
 
             if orig_model == "true":
-                misc.imsave("results/full-resolution/test_all/" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
+                misc.imsave("results/full-resolution/" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
             else:
                 misc.imsave("results/full-resolution/" + str(j) + "_level_" + str(level) +
                         "_epoch_" + str(restore_epoch) + ".png", enhanced)
 
-        end = time.time()
-        print((end - start)/168)
 
 if __name__ == '__main__':
     test_model()
